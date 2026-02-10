@@ -9,11 +9,5 @@ import java.util.Optional;
 
 @Repository
 public interface JobRepository extends JpaRepository<Job, Long> {
-    /*
-     * Jpa support methods
-     * save()
-     * findById()
-     * findAll()
-     * delete()
-     */
+    
 }
