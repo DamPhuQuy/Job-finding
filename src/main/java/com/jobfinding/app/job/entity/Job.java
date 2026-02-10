@@ -9,8 +9,8 @@ import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.ForeignKey;
 import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
 import jakarta.persistence.Id;
+import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.PrePersist;
@@ -22,8 +22,9 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 /* * Design Choices Explanation:
- * 1. MappedSuperclass & Auditing: Sử dụng BaseEntity để tách biệt các trường metadata (createdAt, updatedAt).
+ * 1. MappedSuperclass & Auditing: Sử dụng BaseEntity để tách biệt các trường metadata (id, createdAt, updatedAt).
    * Giúp tuân thủ nguyên tắc DRY (Don't Repeat Yourself).
+   * Kích hoạt JPA Auditing trong Application để tự động cập nhật các trường này (@EnableJpaAuditing).
  * 2. FetchType.LAZY: Luôn ưu tiên Lazy Loading cho các quan hệ @ManyToOne để tránh lỗi N+1
    * và tối ưu hiệu năng bộ nhớ khi truy vấn danh sách lớn.
  * 3. Encapsulation & Boilerplate: Sử dụng Lombok (@Getter, @Setter, @Builder) để code sạch hơn.
@@ -33,15 +34,30 @@ import lombok.Setter;
  */
 
 @Entity
-@Table(name = "jobs") // should define table name
+@Table(
+    name = "jobs", // should define table name
+    indexes = {
+        // title
+        @Index(name = "idx_job_title", columnList = "title"),
+
+        // location
+        @Index(name = "idx_job_location", columnList = "location"),
+
+        // salary
+        @Index(name = "idx_job", columnList = "minSalary, maxSalary"),
+
+        // postedDate
+        @Index(name = "idx_job_posted_date", columnList = "postedDate")
+    })
 @NoArgsConstructor // Generate a no-args constructor, required by JPA
 @AllArgsConstructor // Generate an all-args constructor for easier object creation
 @Getter
 @Setter
-@Builder // Generate a builder for easier object creation with a fluent API
+@Builder // Generate a builder for easier object creation with a fluent API (Fluent API use method chaining)
 public class Job extends BaseEntity {
+
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY) // AUTO_INCREMENT
+    @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
     private Long id;
 
     @Column(nullable = false, length = 255)
