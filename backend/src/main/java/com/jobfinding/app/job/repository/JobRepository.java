@@ -2,7 +2,7 @@ package com.jobfinding.app.job.repository;
 
 import java.time.Instant;
 
-import org.springframework.data.domain.Page;
+import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
@@ -23,43 +23,43 @@ public interface JobRepository extends JpaRepository<Job, Long> {
      * SQL:
      SELECT * FROM jobs WHERE title LIKE %:keyword%;
      */
-    Page<Job> findByTitleContainingIgnoreCase(String keyword);
+    Slice<Job> findByTitleContainingIgnoreCase(String keyword);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE location LIKE %:location%;
      */
-    Page<Job> findByLocationContainingIgnoreCase(String location);
+    Slice<Job> findByLocationContainingIgnoreCase(String location);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE company LIKE %:company%;
      */
-    Page<Job> findByCompanyContainingIgnoreCase(String company);
+    Slice<Job> findByCompanyContainingIgnoreCase(String company);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE posted_date BETWEEN :from AND :to;
      */
-    Page<Job> findByPostedDateBetween(Instant from, Instant to);
+    Slice<Job> findByPostedDateBetween(Instant from, Instant to);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE job_type_id = :jobTypeId;
      */
-    Page<Job> findByJobTypeId(Long jobTypeId);
+    Slice<Job> findByJobTypeId(Long jobTypeId);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE experience_level_id = :experienceLevelId;
      */
-    Page<Job> findByExperienceLevelId(Long experienceLevelId);
+    Slice<Job> findByExperienceLevelId(Long experienceLevelId);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE source_id = :sourceId;
      */
-    Page<Job> findBySourceId(Long sourceId);
+    Slice<Job> findBySourceId(Long sourceId);
 
     /*
      * SQL:
