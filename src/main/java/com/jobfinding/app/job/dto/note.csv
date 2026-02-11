@@ -1,0 +1,5 @@
+Đối tượng,Vị trí,Mục đích
+Entity,Repository / Service,Ánh xạ trực tiếp với bảng trong Database.
+DTO (Request),Controller / Service,Nhận và Validate dữ liệu từ người dùng gửi lên.
+DTO (Response),Service / Controller,Định dạng dữ liệu đẹp và an toàn để trả về.
+ResponseEntity,Controller,Quản lý HTTP Status Code và Headers của API.
