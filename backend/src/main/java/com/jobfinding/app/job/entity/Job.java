@@ -114,7 +114,6 @@ public class Job extends BaseEntity {
     private ExperienceLevel experienceLevel; // Intern, Junior, Senior
     private Instant postedDate;
 
-    @PrePersist
     protected void onCreate() {
         if (postedDate == null) {
             postedDate = Instant.now();

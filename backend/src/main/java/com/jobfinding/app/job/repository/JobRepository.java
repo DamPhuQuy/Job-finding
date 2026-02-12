@@ -63,8 +63,14 @@ public interface JobRepository extends JpaRepository<Job, Long> {
 
     /*
      * SQL:
-     SELECT COUNT(*) FROM jobs WHERE job_type_id = :jobType.id;
+     INSERT INTO jobs (...) VALUES (...);
      */
+    <S extends Job> S save(S entity);
+
+    /*
+             * SQL:
+             SELECT COUNT(*) FROM jobs WHERE job_type_id = :jobType.id;
+             */
     long countByJobType(JobType jobType);
 
     /*
