@@ -1,11 +1,7 @@
-import LandingPage from "./pages/LandingPage";
+import LandingPage from "./pages/LandingPage.tsx";
 
 function App() {
-  return (
-    <div className="App">
-      <LandingPage />
-    </div>
-  );
+  return <LandingPage />;
 }
 
 export default App;
