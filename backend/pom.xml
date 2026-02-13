@@ -29,6 +29,7 @@
 	<properties>
 		<java.version>25</java.version>
 		<flyway.version>10.21.0</flyway.version>
+		<springdoc.version>3.0.1</springdoc.version>
 	</properties>
 	<dependencies>
 		<dependency>
@@ -87,6 +88,13 @@
 		<dependency>
 			<groupId>org.flywaydb</groupId>
 			<artifactId>flyway-database-postgresql</artifactId>
+		</dependency>
+		<!-- Source: https://mvnrepository.com/artifact/org.springdoc/springdoc-openapi-starter-webmvc-ui -->
+		<dependency>
+			<groupId>org.springdoc</groupId>
+			<artifactId>springdoc-openapi-starter-webmvc-ui</artifactId>
+			<version>3.0.1</version>
+			<scope>compile</scope>
 		</dependency>
 	</dependencies>
 
