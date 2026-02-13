@@ -1,8 +1,16 @@
 spring:
+  profiles:
+    active: dev
+
   datasource:
-    url: ${DB_URL:jdbc:postgresql://localhost:5432/postgres}
-    username: ${DB_USERNAME:postgres}
-    password: ${DB_PASSWORD:quy16506}
+    url: ${DB_URL}
+    username: ${DB_USERNAME}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+    hikari:
+      maximum-pool-size: 10
+      minimum-idle: 5
+      idle-timeout: 30000
 
   jpa:
     hibernate:
@@ -12,15 +20,29 @@ spring:
       hibernate:
         format_sql: true
         dialect: org.hibernate.dialect.PostgreSQLDialect
+        jdbc:
+          time_zone: UTC
 
   flyway:
     enabled: true
+    locations: classpath:db/migration
     baseline-on-migrate: true
     baseline-version: 0
-    locations: classpath:db/migration
     sql-migration-prefix: V
     sql-migration-separator: __
     sql-migration-suffixes: .sql
 
+  config: # config.import loads environment variables from .env file
+    import: optional:file:.env[.properties]
+    # explain: `optional` to avoid errors if .env file is missing
+    # `.properties` allows loading from .env or .env.properties
+    # `file:.env` is the path to the environment file
+
 server:
   port: 8080
+
+logging:
+  level:
+    root: INFO
+  file:
+    name: logs/application.log
