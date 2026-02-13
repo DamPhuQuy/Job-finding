@@ -1,4 +1,9 @@
-export type JobTypeName = "Full-time" | "Part-time" | "Contract" | "Remote" | string;
+export type JobTypeName =
+  | "Full-time"
+  | "Part-time"
+  | "Contract"
+  | "Remote"
+  | string;
 
 export interface JobTypeDto {
   id: number;
