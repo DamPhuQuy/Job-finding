@@ -1,7 +1,9 @@
 package com.jobfinding.app.job.service;
 
 import java.time.Instant;
+import java.util.List;
 import java.util.Optional;
+import java.util.stream.Collectors;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
@@ -61,6 +63,12 @@ public class JobService {
     public Slice<JobSummaryResponse> findBySourceId(Long sourceId) {
         return jobRepository.findBySourceId(sourceId)
                 .map(JobMapper::toSummaryResponseDto);
+    }
+
+    public List<JobSummaryResponse> findAllSummaries() {
+        return jobRepository.findAll().stream()
+                .map(JobMapper::toSummaryResponseDto)
+                .collect(Collectors.toList());
     }
 
     public Optional<JobSummaryResponse> findSummaryById(Long id) {

@@ -1,6 +1,7 @@
 package com.jobfinding.app.job.controller;
 
 import java.time.Instant;
+import java.util.List;
 
 import org.springframework.data.domain.Slice;
 import org.springframework.http.HttpStatus;
@@ -58,6 +59,15 @@ public class JobController {
         return jobService.findSummaryById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
+    }
+
+    /**
+     * Get all jobs
+     * GET /api/jobs
+     */
+    @GetMapping
+    public ResponseEntity<List<JobSummaryResponse>> getAllJobs() {
+        return ResponseEntity.ok(jobService.findAllSummaries());
     }
 
     @GetMapping("/{id}/detailed")

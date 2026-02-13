@@ -27,12 +27,14 @@ public class JobMapper {
         }
 
         return JobSummaryResponse.builder()
+            .id(job.getId())
                 .title(job.getTitle())
                 .company(job.getCompany())
                 .location(job.getLocation())
                 .minSalary(job.getMinSalary())
                 .maxSalary(job.getMaxSalary())
                 .salaryCurrency(job.getSalaryCurrency())
+            .jobType(mapJobType(job.getJobType()))
                 .experienceLevel(mapExperienceLevel(job.getExperienceLevel()))
                 .postedDate(job.getPostedDate())
                 .build();

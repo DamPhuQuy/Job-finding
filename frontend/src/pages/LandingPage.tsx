@@ -24,19 +24,43 @@ import {
   Toolbar,
   Typography,
 } from "@mui/material";
-import React, { useState } from "react";
-import { featuredJobs, jobTypes } from "../data/mockData";
+import React, { useCallback, useEffect, useState } from "react";
+import { searchJobs, type JobSummaryResponse } from "../api/jobs";
+import { jobTypes } from "../data/mockData";
 import { JobType } from "../types";
 
 const LandingPage: React.FC = () => {
   const [jobTitle, setJobTitle] = useState("");
   const [location, setLocation] = useState("");
   const [jobType, setJobType] = useState<JobType>("All Types");
+  const [jobs, setJobs] = useState<JobSummaryResponse[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const fetchJobs = useCallback(async (title?: string, city?: string) => {
+    setIsLoading(true);
+    setError(null);
+    try {
+      const results = await searchJobs({ title, location: city });
+      setJobs(results);
+    } catch (err) {
+      const message =
+        err instanceof Error ? err.message : "Failed to load jobs.";
+      setError(message);
+      setJobs([]);
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   const handleSearch = (e: React.FormEvent) => {
     e.preventDefault();
-    console.log("Searching for:", { jobTitle, location, jobType });
+    void fetchJobs(jobTitle, location);
   };
+
+  useEffect(() => {
+    void fetchJobs();
+  }, [fetchJobs]);
 
   const getJobTypeStyles = (type: string) => {
     const styles: Record<string, { bgcolor: string; color: string }> = {
@@ -48,6 +72,50 @@ const LandingPage: React.FC = () => {
 
     return styles[type] || { bgcolor: "#e2e8f0", color: "#334155" };
   };
+
+  const formatSalaryRange = (job: JobSummaryResponse) => {
+    if (job.minSalary == null && job.maxSalary == null) {
+      return "Salary undisclosed";
+    }
+
+    const currency = job.salaryCurrency ?? "USD";
+    const formatter = new Intl.NumberFormat("en-US", {
+      style: "currency",
+      currency,
+      maximumFractionDigits: 0,
+    });
+
+    const min = job.minSalary != null ? formatter.format(job.minSalary) : null;
+    const max = job.maxSalary != null ? formatter.format(job.maxSalary) : null;
+
+    if (min && max) {
+      return `${min} - ${max}`;
+    }
+
+    return min ?? max ?? "Salary undisclosed";
+  };
+
+  const formatPostedDate = (job: JobSummaryResponse) => {
+    if (!job.postedDate) {
+      return "Posted recently";
+    }
+
+    const date = new Date(job.postedDate);
+    if (Number.isNaN(date.getTime())) {
+      return "Posted recently";
+    }
+
+    return date.toLocaleDateString(undefined, {
+      year: "numeric",
+      month: "short",
+      day: "numeric",
+    });
+  };
+
+  const filteredJobs =
+    jobType === "All Types"
+      ? jobs
+      : jobs.filter((job) => job.jobType?.name === jobType);
 
   return (
     <Box minHeight="100vh" bgcolor="background.default">
@@ -205,8 +273,23 @@ const LandingPage: React.FC = () => {
             Handpicked opportunities from teams building the future.
           </Typography>
         </Stack>
+        {error ? (
+          <Typography color="error" textAlign="center" mb={3}>
+            {error}
+          </Typography>
+        ) : null}
+        {isLoading ? (
+          <Typography color="text.secondary" textAlign="center" mb={3}>
+            Loading jobs...
+          </Typography>
+        ) : null}
+        {!isLoading && !error && filteredJobs.length === 0 ? (
+          <Typography color="text.secondary" textAlign="center" mb={3}>
+            No jobs found. Try adjusting your search.
+          </Typography>
+        ) : null}
         <Grid container spacing={3}>
-          {featuredJobs.map((job) => (
+          {filteredJobs.map((job) => (
             <Grid item xs={12} md={6} lg={4} key={job.id}>
               <Card
                 variant="outlined"
@@ -235,9 +318,9 @@ const LandingPage: React.FC = () => {
                       <Business color="primary" />
                     </Stack>
                     <Chip
-                      label={job.type}
+                      label={job.jobType?.name ?? "Unknown"}
                       size="small"
-                      sx={getJobTypeStyles(job.type)}
+                      sx={getJobTypeStyles(job.jobType?.name ?? "Unknown")}
                     />
                   </Stack>
                   <Typography variant="h6" gutterBottom>
@@ -254,13 +337,13 @@ const LandingPage: React.FC = () => {
                     <Stack direction="row" spacing={1} alignItems="center">
                       <AttachMoney fontSize="small" color="action" />
                       <Typography variant="body2" fontWeight={600}>
-                        {job.salaryRange}
+                        {formatSalaryRange(job)}
                       </Typography>
                     </Stack>
                     <Stack direction="row" spacing={1} alignItems="center">
                       <Schedule fontSize="small" color="action" />
                       <Typography variant="body2" color="text.secondary">
-                        {job.postedDate}
+                        {formatPostedDate(job)}
                       </Typography>
                     </Stack>
                   </Stack>

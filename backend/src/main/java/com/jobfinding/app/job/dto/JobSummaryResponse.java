@@ -24,6 +24,7 @@ public class JobSummaryResponse {
     private Long minSalary;
     private Long maxSalary;
     private String salaryCurrency;
+    private JobTypeDto jobType;
     private ExperienceLevelDto experienceLevel;
     private Instant postedDate;
 
