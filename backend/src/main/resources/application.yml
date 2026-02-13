@@ -23,4 +23,4 @@ spring:
     sql-migration-suffixes: .sql
 
 server:
-  port: 3618
+  port: 8080
