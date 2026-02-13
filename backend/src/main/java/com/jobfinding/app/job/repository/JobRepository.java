@@ -6,10 +6,10 @@ import org.springframework.data.domain.Slice;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.jobfinding.app.job.entity.ExperienceLevel;
-import com.jobfinding.app.job.entity.Job;
-import com.jobfinding.app.job.entity.JobSource;
-import com.jobfinding.app.job.entity.JobType;
+import com.jobfinding.app.job.entity.ExperienceLevelEntity;
+import com.jobfinding.app.job.entity.JobEntity;
+import com.jobfinding.app.job.entity.JobSourceEntity;
+import com.jobfinding.app.job.entity.JobTypeEntity;
 
 /*
  * jpa methods syntax:
@@ -17,67 +17,67 @@ import com.jobfinding.app.job.entity.JobType;
  */
 
 @Repository
-public interface JobRepository extends JpaRepository<Job, Long> {
+public interface JobRepository extends JpaRepository<JobEntity, Long> {
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE title LIKE %:keyword%;
      */
-    Slice<Job> findByTitleContainingIgnoreCase(String keyword);
+    Slice<JobEntity> findByTitleContainingIgnoreCase(String keyword);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE location LIKE %:location%;
      */
-    Slice<Job> findByLocationContainingIgnoreCase(String location);
+    Slice<JobEntity> findByLocationContainingIgnoreCase(String location);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE company LIKE %:company%;
      */
-    Slice<Job> findByCompanyContainingIgnoreCase(String company);
+    Slice<JobEntity> findByCompanyContainingIgnoreCase(String company);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE posted_date BETWEEN :from AND :to;
      */
-    Slice<Job> findByPostedDateBetween(Instant from, Instant to);
+    Slice<JobEntity> findByPostedDateBetween(Instant from, Instant to);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE job_type_id = :jobTypeId;
      */
-    Slice<Job> findByJobTypeId(Long jobTypeId);
+    Slice<JobEntity> findByJobTypeId(Long jobTypeId);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE experience_level_id = :experienceLevelId;
      */
-    Slice<Job> findByExperienceLevelId(Long experienceLevelId);
+    Slice<JobEntity> findByExperienceLevelId(Long experienceLevelId);
 
     /*
      * SQL:
      SELECT * FROM jobs WHERE source_id = :sourceId;
      */
-    Slice<Job> findBySourceId(Long sourceId);
+    Slice<JobEntity> findBySourceId(Long sourceId);
 
     /*
      * SQL:
      INSERT INTO jobs (...) VALUES (...);
      */
-    <S extends Job> S save(S entity);
+    <S extends JobEntity> S save(S entity);
 
     /*
              * SQL:
              SELECT COUNT(*) FROM jobs WHERE job_type_id = :jobType.id;
              */
-    long countByJobType(JobType jobType);
+    long countByJobType(JobTypeEntity jobType);
 
     /*
      * SQL:
      SELECT COUNT(*) FROM jobs WHERE experience_level_id = :experienceLevel.id;
      */
-    long countByExperienceLevel(ExperienceLevel experienceLevel);
+    long countByExperienceLevel(ExperienceLevelEntity experienceLevel);
 
     /*
      * SQL:
@@ -89,7 +89,7 @@ public interface JobRepository extends JpaRepository<Job, Long> {
      * SQL:
      SELECT COUNT(*) FROM jobs WHERE source_id = :source.id;
      */
-    long countBySource(JobSource source);
+    long countBySource(JobSourceEntity source);
 
     /*
      * SQL:

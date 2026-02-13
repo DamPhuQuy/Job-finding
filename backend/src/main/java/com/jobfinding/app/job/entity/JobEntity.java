@@ -13,7 +13,6 @@ import jakarta.persistence.Id;
 import jakarta.persistence.Index;
 import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
-import jakarta.persistence.PrePersist;
 import jakarta.persistence.Table;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
@@ -54,7 +53,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder // Generate a builder for easier object creation with a fluent API (Fluent API use method chaining)
-public class Job extends BaseEntity {
+public class JobEntity extends BaseEntity {
 
     @Id
     @GeneratedValue(strategy = jakarta.persistence.GenerationType.IDENTITY)
@@ -91,7 +90,7 @@ public class Job extends BaseEntity {
      FROM Job j
      JOIN JobSource s ON j.source_id = s.source_id
      */
-    private JobSource source;
+    private JobSourceEntity source;
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "job_type_id", foreignKey = @ForeignKey(name = "fk_job_job_type"))
@@ -101,7 +100,7 @@ public class Job extends BaseEntity {
      FROM Job j
      JOIN JobType t ON j.job_type_id = t.job_type_id
      */
-    private JobType jobType; // FE, BE, Fullstack
+    private JobTypeEntity jobType; // FE, BE, Fullstack
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "experience_level_id", foreignKey = @ForeignKey(name = "fk_job_experience_level"))
@@ -111,7 +110,7 @@ public class Job extends BaseEntity {
      FROM Job j
      JOIN ExperienceLevel e ON j.experience_level_id = e.experience_level_id
      */
-    private ExperienceLevel experienceLevel; // Intern, Junior, Senior
+    private ExperienceLevelEntity experienceLevel; // Intern, Junior, Senior
     private Instant postedDate;
 
     protected void onCreate() {

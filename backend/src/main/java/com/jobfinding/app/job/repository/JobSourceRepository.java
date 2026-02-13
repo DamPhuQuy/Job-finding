@@ -5,14 +5,14 @@ import java.util.Optional;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 
-import com.jobfinding.app.job.entity.JobSource;
+import com.jobfinding.app.job.entity.JobSourceEntity;
 
 /**
  * Repository interface for JobSource entity.
  * Provides CRUD operations and custom queries for job sources.
  */
 @Repository
-public interface JobSourceRepository extends JpaRepository<JobSource, Long> {
+public interface JobSourceRepository extends JpaRepository<JobSourceEntity, Long> {
 
     /**
      * Find a job source by its name (case-insensitive).
@@ -20,7 +20,7 @@ public interface JobSourceRepository extends JpaRepository<JobSource, Long> {
      * @param name the job source name
      * @return Optional containing the JobSource if found
      */
-    Optional<JobSource> findByNameIgnoreCase(String name);
+    Optional<JobSourceEntity> findByNameIgnoreCase(String name);
 
     /**
      * Check if a job source with the given name exists (case-insensitive).
@@ -36,6 +36,6 @@ public interface JobSourceRepository extends JpaRepository<JobSource, Long> {
      * @param websiteUrl the website URL
      * @return Optional containing the JobSource if found
      */
-    Optional<JobSource> findByWebsiteUrl(String websiteUrl);
+    Optional<JobSourceEntity> findByWebsiteUrl(String websiteUrl);
 }
 

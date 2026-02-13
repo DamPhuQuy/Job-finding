@@ -7,13 +7,14 @@ import org.springframework.data.domain.Slice;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import com.jobfinding.app.job.dto.JobDetailedResponse;
 import com.jobfinding.app.job.dto.JobMapper;
 import com.jobfinding.app.job.dto.JobRequestDto;
-import com.jobfinding.app.job.dto.JobResponseDto;
-import com.jobfinding.app.job.entity.ExperienceLevel;
-import com.jobfinding.app.job.entity.Job;
-import com.jobfinding.app.job.entity.JobSource;
-import com.jobfinding.app.job.entity.JobType;
+import com.jobfinding.app.job.dto.JobSummaryResponse;
+import com.jobfinding.app.job.entity.ExperienceLevelEntity;
+import com.jobfinding.app.job.entity.JobEntity;
+import com.jobfinding.app.job.entity.JobSourceEntity;
+import com.jobfinding.app.job.entity.JobTypeEntity;
 import com.jobfinding.app.job.repository.JobRepository;
 
 @Service
@@ -27,49 +28,52 @@ public class JobService {
 
     // ========== Query methods returning DTOs ==========
 
-    public Slice<JobResponseDto> findByTitle(String keyword) {
+    public Slice<JobSummaryResponse> findByTitle(String keyword) {
         return jobRepository.findByTitleContainingIgnoreCase(keyword)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Slice<JobResponseDto> findByLocation(String location) {
+    public Slice<JobSummaryResponse> findByLocation(String location) {
         return jobRepository.findByLocationContainingIgnoreCase(location)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Slice<JobResponseDto> findByCompany(String company) {
+    public Slice<JobSummaryResponse> findByCompany(String company) {
         return jobRepository.findByCompanyContainingIgnoreCase(company)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Slice<JobResponseDto> findByPostedDateBetween(Instant from, Instant to) {
+    public Slice<JobSummaryResponse> findByPostedDateBetween(Instant from, Instant to) {
         return jobRepository.findByPostedDateBetween(from, to)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Slice<JobResponseDto> findByJobTypeId(Long jobTypeId) {
+    public Slice<JobSummaryResponse> findByJobTypeId(Long jobTypeId) {
         return jobRepository.findByJobTypeId(jobTypeId)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Slice<JobResponseDto> findByExperienceLevelId(Long experienceLevelId) {
+    public Slice<JobSummaryResponse> findByExperienceLevelId(Long experienceLevelId) {
         return jobRepository.findByExperienceLevelId(experienceLevelId)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Slice<JobResponseDto> findBySourceId(Long sourceId) {
+    public Slice<JobSummaryResponse> findBySourceId(Long sourceId) {
         return jobRepository.findBySourceId(sourceId)
-                .map(JobMapper::toResponseDto);
+                .map(JobMapper::toSummaryResponseDto);
     }
 
-    public Optional<JobResponseDto> findById(Long id) {
-        return jobRepository.findById(id)
-                .map(JobMapper::toResponseDto);
+    public Optional<JobSummaryResponse> findSummaryById(Long id) {
+        return jobRepository.findById(id).map(JobMapper::toSummaryResponseDto);
+    }
+
+    public Optional<JobDetailedResponse> findDetailedById(Long id) {
+        return jobRepository.findById(id).map(JobMapper::toDetailedResponse);
     }
 
     // ========== Entity-level query methods (for internal use) ==========
 
-    public Optional<Job> findJobEntityById(Long id) {
+    public Optional<JobEntity> findJobEntityById(Long id) {
         return jobRepository.findById(id);
     }
 
@@ -84,18 +88,18 @@ public class JobService {
      * @param jobType the JobType entity
      * @param experienceLevel the ExperienceLevel entity
      * @param jobSource the JobSource entity
-     * @return JobResponseDto of the created job
+     * @return JobSummaryResponse of the created job
      */
     @Transactional
-    public JobResponseDto createJob(JobRequestDto requestDto, JobType jobType,
-                                     ExperienceLevel experienceLevel, JobSource jobSource) {
-        Job job = JobMapper.toEntity(requestDto);
+    public JobSummaryResponse createJob(JobRequestDto requestDto, JobTypeEntity jobType,
+                                     ExperienceLevelEntity experienceLevel, JobSourceEntity jobSource) {
+        JobEntity job = JobMapper.toEntity(requestDto);
         job.setJobType(jobType);
         job.setExperienceLevel(experienceLevel);
         job.setSource(jobSource);
 
-        Job savedJob = jobRepository.save(job);
-        return JobMapper.toResponseDto(savedJob);
+        JobEntity savedJob = jobRepository.save(job);
+        return JobMapper.toSummaryResponseDto(savedJob);
     }
 
     /**
@@ -106,12 +110,12 @@ public class JobService {
      * @param jobType the JobType entity (can be null to keep existing)
      * @param experienceLevel the ExperienceLevel entity (can be null to keep existing)
      * @param jobSource the JobSource entity (can be null to keep existing)
-     * @return JobResponseDto of the updated job, or empty if job not found
+     * @return JobSummaryResponse of the updated job, or empty if job not found
      */
     @Transactional
-    public Optional<JobResponseDto> updateJob(Long id, JobRequestDto requestDto,
-                                               JobType jobType, ExperienceLevel experienceLevel,
-                                               JobSource jobSource) {
+    public Optional<JobSummaryResponse> updateJob(Long id, JobRequestDto requestDto,
+                                               JobTypeEntity jobType, ExperienceLevelEntity experienceLevel,
+                                               JobSourceEntity jobSource) {
         return jobRepository.findById(id)
                 .map(existingJob -> {
                     JobMapper.updateEntityFromDto(existingJob, requestDto);
@@ -126,18 +130,18 @@ public class JobService {
                         existingJob.setSource(jobSource);
                     }
 
-                    Job updatedJob = jobRepository.save(existingJob);
-                    return JobMapper.toResponseDto(updatedJob);
+                    JobEntity updatedJob = jobRepository.save(existingJob);
+                    return JobMapper.toSummaryResponseDto(updatedJob);
                 });
     }
 
     // ========== Count methods ==========
 
-    public long countByJobType(JobType jobType) {
+    public long countByJobType(JobTypeEntity jobType) {
         return jobRepository.countByJobType(jobType);
     }
 
-    public long countByExperienceLevel(ExperienceLevel experienceLevel) {
+    public long countByExperienceLevel(ExperienceLevelEntity experienceLevel) {
         return jobRepository.countByExperienceLevel(experienceLevel);
     }
 
@@ -145,7 +149,7 @@ public class JobService {
         return jobRepository.countByCompanyIgnoreCase(company);
     }
 
-    public long countBySource(JobSource source) {
+    public long countBySource(JobSourceEntity source) {
         return jobRepository.countBySource(source);
     }
 
@@ -169,7 +173,7 @@ public class JobService {
     // ========== Save method (for internal/direct entity manipulation) ==========
 
     @Transactional
-    public Job saveEntity(Job job) {
+    public JobEntity saveEntity(JobEntity job) {
         return jobRepository.save(job);
     }
 

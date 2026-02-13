@@ -15,11 +15,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
+import com.jobfinding.app.job.dto.JobDetailedResponse;
 import com.jobfinding.app.job.dto.JobRequestDto;
-import com.jobfinding.app.job.dto.JobResponseDto;
-import com.jobfinding.app.job.entity.ExperienceLevel;
-import com.jobfinding.app.job.entity.JobSource;
-import com.jobfinding.app.job.entity.JobType;
+import com.jobfinding.app.job.dto.JobSummaryResponse;
+import com.jobfinding.app.job.entity.ExperienceLevelEntity;
+import com.jobfinding.app.job.entity.JobSourceEntity;
+import com.jobfinding.app.job.entity.JobTypeEntity;
 import com.jobfinding.app.job.repository.ExperienceLevelRepository;
 import com.jobfinding.app.job.repository.JobSourceRepository;
 import com.jobfinding.app.job.repository.JobTypeRepository;
@@ -53,8 +54,15 @@ public class JobController {
      * GET /api/jobs/{id}
      */
     @GetMapping("/{id}")
-    public ResponseEntity<JobResponseDto> getJobById(@PathVariable Long id) {
-        return jobService.findById(id)
+    public ResponseEntity<JobSummaryResponse> getJobById(@PathVariable Long id) {
+        return jobService.findSummaryById(id)
+                .map(ResponseEntity::ok)
+                .orElse(ResponseEntity.notFound().build());
+    }
+
+    @GetMapping("/{id}/detailed")
+    public ResponseEntity<JobDetailedResponse> getJobDetailedById(@PathVariable Long id) {
+        return jobService.findDetailedById(id)
                 .map(ResponseEntity::ok)
                 .orElse(ResponseEntity.notFound().build());
     }
@@ -64,10 +72,12 @@ public class JobController {
      * GET /api/jobs/search/title?keyword={keyword}
      */
     @GetMapping("/search/title")
-    public ResponseEntity<Slice<JobResponseDto>> searchByTitle(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchByTitle(
             @RequestParam String keyword) {
-        Slice<JobResponseDto> jobs = jobService.findByTitle(keyword);
+        Slice<JobSummaryResponse> jobs = jobService.findByTitle(keyword);
         return ResponseEntity.ok(jobs);
+        // ~ return new ResponseEntity<>(jobs, HttpStatus.OK);
+        // OK = 200
     }
 
     /**
@@ -75,9 +85,9 @@ public class JobController {
      * GET /api/jobs/search/location?location={location}
      */
     @GetMapping("/search/location")
-    public ResponseEntity<Slice<JobResponseDto>> searchByLocation(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchByLocation(
             @RequestParam String location) {
-        Slice<JobResponseDto> jobs = jobService.findByLocation(location);
+        Slice<JobSummaryResponse> jobs = jobService.findByLocation(location);
         return ResponseEntity.ok(jobs);
     }
 
@@ -86,9 +96,9 @@ public class JobController {
      * GET /api/jobs/search/company?company={company}
      */
     @GetMapping("/search/company")
-    public ResponseEntity<Slice<JobResponseDto>> searchByCompany(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchByCompany(
             @RequestParam String company) {
-        Slice<JobResponseDto> jobs = jobService.findByCompany(company);
+        Slice<JobSummaryResponse> jobs = jobService.findByCompany(company);
         return ResponseEntity.ok(jobs);
     }
 
@@ -97,10 +107,10 @@ public class JobController {
      * GET /api/jobs/search/date-range?from={from}&to={to}
      */
     @GetMapping("/search/date-range")
-    public ResponseEntity<Slice<JobResponseDto>> searchByDateRange(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchByDateRange(
             @RequestParam Instant from,
             @RequestParam Instant to) {
-        Slice<JobResponseDto> jobs = jobService.findByPostedDateBetween(from, to);
+        Slice<JobSummaryResponse> jobs = jobService.findByPostedDateBetween(from, to);
         return ResponseEntity.ok(jobs);
     }
 
@@ -109,9 +119,9 @@ public class JobController {
      * GET /api/jobs/search/job-type/{jobTypeId}
      */
     @GetMapping("/search/job-type/{jobTypeId}")
-    public ResponseEntity<Slice<JobResponseDto>> searchByJobType(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchByJobType(
             @PathVariable Long jobTypeId) {
-        Slice<JobResponseDto> jobs = jobService.findByJobTypeId(jobTypeId);
+        Slice<JobSummaryResponse> jobs = jobService.findByJobTypeId(jobTypeId);
         return ResponseEntity.ok(jobs);
     }
 
@@ -120,9 +130,9 @@ public class JobController {
      * GET /api/jobs/search/experience-level/{experienceLevelId}
      */
     @GetMapping("/search/experience-level/{experienceLevelId}")
-    public ResponseEntity<Slice<JobResponseDto>> searchByExperienceLevel(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchByExperienceLevel(
             @PathVariable Long experienceLevelId) {
-        Slice<JobResponseDto> jobs = jobService.findByExperienceLevelId(experienceLevelId);
+        Slice<JobSummaryResponse> jobs = jobService.findByExperienceLevelId(experienceLevelId);
         return ResponseEntity.ok(jobs);
     }
 
@@ -131,9 +141,9 @@ public class JobController {
      * GET /api/jobs/search/source/{sourceId}
      */
     @GetMapping("/search/source/{sourceId}")
-    public ResponseEntity<Slice<JobResponseDto>> searchBySource(
+    public ResponseEntity<Slice<JobSummaryResponse>> searchBySource(
             @PathVariable Long sourceId) {
-        Slice<JobResponseDto> jobs = jobService.findBySourceId(sourceId);
+        Slice<JobSummaryResponse> jobs = jobService.findBySourceId(sourceId);
         return ResponseEntity.ok(jobs);
     }
 
@@ -152,19 +162,19 @@ public class JobController {
     public ResponseEntity<?> createJob(@Valid @RequestBody JobRequestDto requestDto) {
 
         // Fetch related entities with error handling
-        JobType jobType = jobTypeRepository.findById(requestDto.getJobTypeId())
+        JobTypeEntity jobType = jobTypeRepository.findById(requestDto.getJobTypeId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "JobType not found with id: " + requestDto.getJobTypeId()));
 
-        ExperienceLevel experienceLevel = experienceLevelRepository.findById(requestDto.getExperienceLevelId())
+        ExperienceLevelEntity experienceLevel = experienceLevelRepository.findById(requestDto.getExperienceLevelId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "ExperienceLevel not found with id: " + requestDto.getExperienceLevelId()));
 
-        JobSource jobSource = jobSourceRepository.findById(requestDto.getSourceId())
+        JobSourceEntity jobSource = jobSourceRepository.findById(requestDto.getSourceId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "JobSource not found with id: " + requestDto.getSourceId()));
 
-        JobResponseDto response = jobService.createJob(requestDto, jobType, experienceLevel, jobSource);
+        JobSummaryResponse response = jobService.createJob(requestDto, jobType, experienceLevel, jobSource);
         return ResponseEntity.status(HttpStatus.CREATED).body(response);
     }
 
@@ -173,7 +183,6 @@ public class JobController {
     /**
      * Update an existing job
      * PUT /api/jobs/{id}
-     *
      * Updates all fields of the job. Related entities are fetched based on IDs in the request.
      */
     @PutMapping("/{id}")
@@ -182,15 +191,15 @@ public class JobController {
             @Valid @RequestBody JobRequestDto requestDto) {
 
         // Fetch related entities with error handling
-        JobType jobType = jobTypeRepository.findById(requestDto.getJobTypeId())
+        JobTypeEntity jobType = jobTypeRepository.findById(requestDto.getJobTypeId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "JobType not found with id: " + requestDto.getJobTypeId()));
 
-        ExperienceLevel experienceLevel = experienceLevelRepository.findById(requestDto.getExperienceLevelId())
+        ExperienceLevelEntity experienceLevel = experienceLevelRepository.findById(requestDto.getExperienceLevelId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "ExperienceLevel not found with id: " + requestDto.getExperienceLevelId()));
 
-        JobSource jobSource = jobSourceRepository.findById(requestDto.getSourceId())
+        JobSourceEntity jobSource = jobSourceRepository.findById(requestDto.getSourceId())
                 .orElseThrow(() -> new IllegalArgumentException(
                         "JobSource not found with id: " + requestDto.getSourceId()));
 

@@ -1,13 +1,13 @@
 package com.jobfinding.app.job.dto;
 
-import com.jobfinding.app.job.entity.ExperienceLevel;
-import com.jobfinding.app.job.entity.Job;
-import com.jobfinding.app.job.entity.JobSource;
-import com.jobfinding.app.job.entity.JobType;
+import com.jobfinding.app.job.entity.ExperienceLevelEntity;
+import com.jobfinding.app.job.entity.JobEntity;
+import com.jobfinding.app.job.entity.JobSourceEntity;
+import com.jobfinding.app.job.entity.JobTypeEntity;
 
 /**
  * Mapper utility class to convert between Job entities and DTOs.
- * Provides static methods for mapping Job to JobResponseDto and JobRequestDto to Job.
+ * Provides static methods for mapping Job to JobSummaryResponse and JobRequestDto to Job.
  */
 public class JobMapper {
 
@@ -21,12 +21,30 @@ public class JobMapper {
      * @param job the Job entity
      * @return JobResponseDto with all fields mapped
      */
-    public static JobResponseDto toResponseDto(Job job) {
+    public static JobSummaryResponse toSummaryResponseDto(JobEntity job) {
         if (job == null) {
             return null;
         }
 
-        return JobResponseDto.builder()
+        return JobSummaryResponse.builder()
+                .title(job.getTitle())
+                .company(job.getCompany())
+                .location(job.getLocation())
+                .minSalary(job.getMinSalary())
+                .maxSalary(job.getMaxSalary())
+                .salaryCurrency(job.getSalaryCurrency())
+                .experienceLevel(mapExperienceLevel(job.getExperienceLevel()))
+                .postedDate(job.getPostedDate())
+                .build();
+    }
+
+    public static JobDetailedResponse toDetailedResponse(JobEntity job) {
+        if (job == null) {
+            return null;
+        }
+
+        return JobDetailedResponse.builder()
+                .id(job.getId())
                 .title(job.getTitle())
                 .description(job.getDescription())
                 .company(job.getCompany())
@@ -38,8 +56,6 @@ public class JobMapper {
                 .jobType(mapJobType(job.getJobType()))
                 .experienceLevel(mapExperienceLevel(job.getExperienceLevel()))
                 .postedDate(job.getPostedDate())
-                .createdAt(job.getCreatedAt())
-                .updatedAt(job.getUpdatedAt())
                 .build();
     }
 
@@ -51,12 +67,12 @@ public class JobMapper {
      * @param dto the JobRequestDto
      * @return Job entity with fields mapped from DTO
      */
-    public static Job toEntity(JobRequestDto dto) {
+    public static JobEntity toEntity(JobRequestDto dto) {
         if (dto == null) {
             return null;
         }
 
-        return Job.builder()
+        return JobEntity.builder()
                 .title(dto.getTitle())
                 .description(dto.getDescription())
                 .company(dto.getCompany())
@@ -75,7 +91,7 @@ public class JobMapper {
      * @param job the existing Job entity to update
      * @param dto the JobRequestDto with new data
      */
-    public static void updateEntityFromDto(Job job, JobRequestDto dto) {
+    public static void updateEntityFromDto(JobEntity job, JobRequestDto dto) {
         if (job == null || dto == null) {
             return;
         }
@@ -90,32 +106,32 @@ public class JobMapper {
         job.setPostedDate(dto.getPostedDate());
     }
 
-    private static JobResponseDto.JobSourceDto mapJobSource(JobSource source) {
+    private static JobSummaryResponse.JobSourceDto mapJobSource(JobSourceEntity source) {
         if (source == null) {
             return null;
         }
-        return JobResponseDto.JobSourceDto.builder()
+        return JobSummaryResponse.JobSourceDto.builder()
                 .id(source.getId())
                 .name(source.getName())
                 .websiteUrl(source.getWebsiteUrl())
                 .build();
     }
 
-    private static JobResponseDto.JobTypeDto mapJobType(JobType jobType) {
+    private static JobSummaryResponse.JobTypeDto mapJobType(JobTypeEntity jobType) {
         if (jobType == null) {
             return null;
         }
-        return JobResponseDto.JobTypeDto.builder()
+        return JobSummaryResponse.JobTypeDto.builder()
                 .id(jobType.getId())
                 .name(jobType.getName())
                 .build();
     }
 
-    private static JobResponseDto.ExperienceLevelDto mapExperienceLevel(ExperienceLevel experienceLevel) {
+    private static JobSummaryResponse.ExperienceLevelDto mapExperienceLevel(ExperienceLevelEntity experienceLevel) {
         if (experienceLevel == null) {
             return null;
         }
-        return JobResponseDto.ExperienceLevelDto.builder()
+        return JobSummaryResponse.ExperienceLevelDto.builder()
                 .id(experienceLevel.getId())
                 .name(experienceLevel.getName())
                 .build();

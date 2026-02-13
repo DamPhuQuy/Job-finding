@@ -15,22 +15,17 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 @Builder
-public class JobResponseDto {
-    
+public class JobSummaryResponse {
+
     private Long id;
     private String title;
-    private String description;
     private String company;
     private String location;
     private Long minSalary;
     private Long maxSalary;
     private String salaryCurrency;
-    private JobSourceDto source;
-    private JobTypeDto jobType;
     private ExperienceLevelDto experienceLevel;
     private Instant postedDate;
-    private Instant createdAt;
-    private Instant updatedAt;
 
     /**
      * DTO for JobSource

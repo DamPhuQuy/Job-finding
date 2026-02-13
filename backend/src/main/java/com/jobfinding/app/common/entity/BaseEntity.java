@@ -25,11 +25,12 @@ import lombok.Setter;
 public abstract class BaseEntity {
 
     @CreatedDate // Automatically set when the entity is first persisted
-    @Column(updatable = false)
+    @Column(updatable = false, nullable = false)
     private Instant createdAt;
 
 
     @LastModifiedBy // Automatically set when the entity is updated
+    @Column(nullable = false)
     private Instant updatedAt;
 
     @PrePersist // Automatically set before inserting into the database if not set
